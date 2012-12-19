@@ -12,9 +12,24 @@ namespace SimpleClient
 {
     class Program
     {
-        static void Main(string[] args) {
-            var sericeClient = new JsonServiceClient("http://localhost:32284");
-            
+        static void Main(string[] args)
+        {
+            args = new[] {"LOCAL"};
+
+            IRestClient sericeClient;
+            InProcessAppHost inProcHost = null;
+            if (args.Length > 0 && args[0] == "LOCAL")
+            {
+                inProcHost = new InProcessAppHost();
+                inProcHost.Init();
+                inProcHost.Start("http://localhost:8888/");
+                sericeClient = new JsonServiceClient("http://localhost:8888");
+            }
+            else
+            {
+                sericeClient = new JsonServiceClient("http://localhost:32284");
+            }
+
             Console.WriteLine("Example Successful Login:");
             var user = sericeClient.Post(new Login() {Username = "chris", Password = "sirhc"});
             user.PrintDump();
@@ -52,8 +67,16 @@ namespace SimpleClient
                 Console.WriteLine(webEx.ToString());
             }
 
+          
             Console.WriteLine("Press [enter] to exit");
             Console.ReadLine();
+            
+            if (inProcHost != null)
+            {
+                inProcHost.Stop();
+                inProcHost.Dispose();
+            }
         }
     }
+
 }
