@@ -50,6 +50,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Example\Security\Version2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Example\Security\Login.cs" />
   </ItemGroup>

@@ -31,12 +31,14 @@ namespace SimpleClient
             }
 
             Console.WriteLine("Example Successful Login:");
-            var user = sericeClient.Post(new Login() {Username = "chris", Password = "sirhc"});
+            var request = new Login() {Username = "chris", Password = "sirhc"};
+            var user = sericeClient.Post(request);
             user.PrintDump();
 
             try {
                 Console.WriteLine("Example Invalid Login");
-                user = sericeClient.Post(new Login() {Username = "chris", Password = "xxx"});
+                request = new Login() {Username = "chris", Password = "xxx"};
+                user = sericeClient.Post(request);
             }
             catch (WebServiceException webEx) {
                 Console.WriteLine("Caught Exception:");

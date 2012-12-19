@@ -6,18 +6,44 @@ using System.Linq;
 
 namespace Api.Example.Security {
     public class SecurityService : IService {
-         public object Post(Login request) {
-             if (request.Username == Reverse(request.Password)) {
-                 return new SecurityUser() {
-                     Username = request.Username,
-                     EmailAddress = request.Username + "@example.local",
-                     Timezone = -6
-                 };
-             }
-             else {
-                 return new HttpError("Invalid username and password");
-             }
-         }
+        public object Post(Login request)
+        {
+            //V1 of service did not allow selection of password algorithm
+            //now if we get an old version request, then we will just pick the correct default
+            if (request.Version < 2)
+            {
+                request.SecurityAlgorithm = "reverse";
+            }
+
+            Func<string, string> passwordEncrypt = null;
+            switch (request.SecurityAlgorithm)
+            {
+            case "reverse":
+                passwordEncrypt = Reverse;
+                break;
+            case "upper":
+                passwordEncrypt = s => s.ToUpper();
+                break;
+            default:
+                throw new HttpError("Invalid password algorithm");
+            }
+
+
+
+            if (request.Password == passwordEncrypt(request.Username))
+            {
+                return new SecurityUser()
+                       {
+                           Username = request.Username,
+                           EmailAddress = request.Username + "@example.local",
+                           Timezone = -6
+                       };
+            }
+            else
+            {
+                return new HttpError("Invalid username and password");
+            }
+        }
 
         public static string Reverse(string s) {
             char[] charArray = s.ToCharArray();
